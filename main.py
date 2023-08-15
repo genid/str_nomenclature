@@ -10,7 +10,11 @@ for char in input_seq:
         st.error("Invalid character in sequence")
         st.stop()
 
-min_repeats = st.number_input("Minimum number of repeats", min_value=1, value=6, step=1, key="min_repeats")
+col1, col2 = st.beta_columns(2)
+with col1:
+    min_repeats = st.number_input("Minimum number of repeats", min_value=1, value=6, step=1, key="min_repeats")
+with col2:
+    convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif")
 
 motifs_list = [line.rstrip('\n') for line in open("motifs.txt")]
 base_motifs_list = [line.rstrip("\n").split(",") for line in open("motifs_dict.txt")]
@@ -34,12 +38,17 @@ nomenclature = "[START]"
 cursor = 0
 
 for motif in sorted_str_repeat_list:
+    if convert_to_base_motif:
+        use_motif = base_motifs_dict[motif['motif']]
+    else:
+        use_motif = motif['motif']
+
     if motif["start"] == cursor:
-        nomenclature += f"[{base_motifs_dict[motif['motif']]}]{motif['repeats']}"
+        nomenclature += f"[{use_motif}]{motif['repeats']}"
         cursor = motif['end']
     else:
         nomenclature += f"[N]{motif['start'] - cursor}"
-        nomenclature += f"[{base_motifs_dict[motif['motif']]}]{motif['repeats']}"
+        nomenclature += f"[{use_motif}]{motif['repeats']}"
         cursor = motif['end']
 if cursor < len(input_seq):
     nomenclature += f"[N]{len(input_seq) - cursor}"
