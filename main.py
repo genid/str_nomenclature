@@ -3,14 +3,15 @@ import re
 import streamlit as st
 
 input_seq = st.text_area("Paste your sequence here", height=100, key="seq").upper()
+accepted_chars = ["A", "C", "G", "T"]
 
-accepted_chars = ["A", "C", "G", "T", "N"]
 for char in input_seq:
     if char not in accepted_chars:
-        st.error("Invalid character in sequence")
-        st.stop()
+        st.error("Invalid characters are ignored")
 
-col1, col2 = st.beta_columns(2)
+input_seq = [char for char in input_seq if char in accepted_chars]
+
+col1, col2 = st.columns(2)
 with col1:
     min_repeats = st.number_input("Minimum number of repeats", min_value=1, value=6, step=1, key="min_repeats")
 with col2:
