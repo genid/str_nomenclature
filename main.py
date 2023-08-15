@@ -2,7 +2,7 @@ import re
 
 import streamlit as st
 
-input_seq = st.text_area("Paste your sequence here", height=100, key="seq").upper()
+input_seq = st.text_area("Paste your sequence here", height=100, key="seq").strip().upper()
 accepted_chars = ["A", "C", "G", "T"]
 
 for char in input_seq:
