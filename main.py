@@ -8,6 +8,7 @@ accepted_chars = ["A", "C", "G", "T"]
 for char in input_seq:
     if char not in accepted_chars:
         st.error("Invalid characters are ignored")
+        break
 
 input_seq = "".join([char for char in input_seq if char in accepted_chars])
 
