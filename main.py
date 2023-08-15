@@ -10,7 +10,7 @@ for char in input_seq:
         st.error("Invalid character in sequence")
         st.stop()
 
-min_repeats = st.number_input("Minimum number of repeats", min_value=1, value=3, step=1, key="min_repeats")
+min_repeats = st.number_input("Minimum number of repeats", min_value=1, value=6, step=1, key="min_repeats")
 
 motifs_list = [line.rstrip('\n') for line in open("motifs.txt")]
 base_motifs_list = [line.rstrip("\n").split(",") for line in open("motifs_dict.txt")]
