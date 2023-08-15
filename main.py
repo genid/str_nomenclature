@@ -9,13 +9,10 @@ for char in input_seq:
     if char not in accepted_chars:
         st.error("Invalid characters are ignored")
 
-# input_seq = [char for char in input_seq if char in accepted_chars]
+input_seq = "".join([char for char in input_seq if char in accepted_chars])
 
-col1, col2 = st.columns(2)
-with col1:
-    min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats")
-with col2:
-    convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif")
+min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats")
+convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif")
 
 motifs_list = [line.rstrip('\n') for line in open("motifs.txt")]
 base_motifs_list = [line.rstrip("\n").split(",") for line in open("motifs_dict.txt")]
