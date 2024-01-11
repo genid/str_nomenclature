@@ -79,7 +79,10 @@ for i, input_seq in enumerate(input_seqs):
     nomenclature += ""
 
     st.write(f"Sequence {i+1}: {input_seq}")
-    st.subheader(nomenclature)
+    st.write(nomenclature)
 
     unique_motifs = set([motif['motif'].replace("~", "") for motif in sorted_str_repeat_list])
-    st.write(f"Unique motifs: {unique_motifs}")
+    st.write(f"Unique motifs: {', '.join(unique_motifs)}")
+
+    st.divider()
+
