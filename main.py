@@ -7,9 +7,9 @@ accepted_chars = ["A", "C", "G", "T", "N"]
 rev_comp = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 min_len = {1: 5, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
 
-min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats", help="Minimum number of repeats to be considered as a motif. Note that the minimum number of repeats for mono-nucleotide motifs is always 5.")
+min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=2, step=1, key="min_repeats", help="Minimum number of repeats to be considered as a motif. Note that the minimum number of repeats for mono-nucleotide motifs is always 5.")
 convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif", help="Reverse complement base motifs are indicated by ~ (tilde) symbol")
-hide_N = st.checkbox("Hide N", value=False, key="hide_N", help="Hide N in the nomenclature")
+hide_N = st.checkbox("Hide N", value=True, key="hide_N", help="Hide N in the nomenclature")
 
 def convert_nomenclature_to_sequence(input_seq):
     motifs = re.findall(r'(~?[ATCGN]+)\[(\d+)\]', input_seq)
