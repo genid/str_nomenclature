@@ -9,7 +9,7 @@ min_len = {1: 5, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
 
 min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats", help="Minimum number of repeats to be considered as a motif. Note that the minimum number of repeats for mono-nucleotide motifs is always 5.")
 convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif", help="Reverse complement base motifs are indicated by ~ (tilde) symbol")
-
+hide_N = st.checkbox("Hide N", value=False, key="hide_N", help="Hide N in the nomenclature")
 
 def convert_nomenclature_to_sequence(input_seq):
     motifs = re.findall(r'(~?[ATCGN]+)\[(\d+)\]', input_seq)
@@ -71,14 +71,17 @@ for i, input_seq in enumerate(input_seqs):
             nomenclature += f"{use_motif}[{motif['repeats']}]"
             cursor = motif['end']
         else:
-            nomenclature += f"N[{motif['start'] - cursor}]"
-            nomenclature += f"{use_motif}[{motif['repeats']}]"
+            if not hide_N:
+                nomenclature += f"N[{motif['start'] - cursor}]"
+                nomenclature += f"{use_motif}[{motif['repeats']}]"
             cursor = motif['end']
     if cursor < len(input_seq):
-        nomenclature += f"N[{len(input_seq) - cursor}]"
+        if not hide_N:
+            nomenclature += f"N[{len(input_seq) - cursor}]"
     nomenclature += ""
 
-    st.write(f"Sequence {i+1}: {input_seq}")
+    st.subheader(f"Result {i+1}")
+    st.write(input_seq)
     st.write(nomenclature)
 
     unique_motifs = set([motif['motif'].replace("~", "") for motif in sorted_str_repeat_list])
