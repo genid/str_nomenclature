@@ -73,7 +73,7 @@ for i, input_seq in enumerate(input_seqs):
         else:
             if not hide_N:
                 nomenclature += f"N[{motif['start'] - cursor}]"
-                nomenclature += f"{use_motif}[{motif['repeats']}]"
+            nomenclature += f"{use_motif}[{motif['repeats']}]"
             cursor = motif['end']
     if cursor < len(input_seq):
         if not hide_N:
