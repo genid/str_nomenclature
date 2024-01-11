@@ -2,12 +2,12 @@ import re
 
 import streamlit as st
 
-input_seqs = st.text_area("Paste your sequence(s) here. Each sequence on a separate line.", height=100, key="seq").strip().upper().split("\n")
+input_seqs = st.text_area("Paste your sequence(s) and/or nomenclatures here. Each sequence on a separate line.", height=100, key="seq").strip().upper().split("\n")
 accepted_chars = ["A", "C", "G", "T", "N"]
 rev_comp = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 min_len = {1: 5, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
 
-min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats")
+min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats", help="Minimum number of repeats to be considered as a motif. Note that the minimum number of repeats for mono-nucleotide motifs is always 5.")
 convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif", help="Reverse complement base motifs are indicated by ~ (tilde) symbol")
 
 
@@ -78,4 +78,8 @@ for input_seq in input_seqs:
         nomenclature += f"N[{len(input_seq) - cursor}]"
     nomenclature += ""
 
+    st.header(input_seq)
     st.write(nomenclature)
+
+    unique_motifs = set([motif['motif'].replace("~", "") for motif in sorted_str_repeat_list])
+    st.write(f"Unique motifs: {unique_motifs}")
