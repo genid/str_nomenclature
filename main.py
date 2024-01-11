@@ -2,55 +2,80 @@ import re
 
 import streamlit as st
 
-input_seq = st.text_area("Paste your sequence here", height=100, key="seq").strip().upper()
-accepted_chars = ["A", "C", "G", "T"]
-
-for char in input_seq:
-    if char not in accepted_chars:
-        st.error("Invalid characters are ignored")
-        break
-
-input_seq = "".join([char for char in input_seq if char in accepted_chars])
+input_seqs = st.text_area("Paste your sequence(s) here. Each sequence on a separate line.", height=100, key="seq").strip().upper().split("\n")
+accepted_chars = ["A", "C", "G", "T", "N"]
+rev_comp = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+min_len = {1: 5, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
 
 min_repeats = st.number_input("Minimum number of repeats", min_value=2, value=6, step=1, key="min_repeats")
 convert_to_base_motif = st.checkbox("Convert to base motif", value=True, key="convert_to_base_motif", help="Reverse complement base motifs are indicated by ~ (tilde) symbol")
 
-motifs_list = [line.rstrip('\n') for line in open("motifs.txt")]
-base_motifs_list = [line.rstrip("\n").split(",") for line in open("motifs_dict.txt")]
-base_motifs_dict = {key: value for key, value in base_motifs_list}
 
-str_repeat_list = []
+def convert_nomenclature_to_sequence(input_seq):
+    motifs = re.findall(r'(~?[ATCGN]+)\[(\d+)\]', input_seq)
+    sequence = ""
 
-for str_motif in motifs_list:
-    if str_motif * min_repeats in input_seq:
-        pattern = f"((?:{str_motif}){{{min_repeats},}})"
+    for motif, count in motifs:
+        if motif.startswith("~"):
+            motif = motif.replace("~", "")
+            motif = ''.join(rev_comp[nt] for nt in reversed(motif))
 
-        for match in re.finditer(pattern, input_seq):
-            str_repeat_list.append({"start": match.start(1), "end": match.end(1), "motif": str_motif,
-                                    "repeats": match.group(1).count(str_motif)})
-    else:
-        continue
+        sequence += motif * int(count)
 
-sorted_str_repeat_list = sorted(str_repeat_list, key=lambda d: d['start'])
+    return sequence
 
-nomenclature = "[START]"
-cursor = 0
 
-for motif in sorted_str_repeat_list:
-    if convert_to_base_motif:
-        use_motif = base_motifs_dict[motif['motif']]
-    else:
-        use_motif = motif['motif']
+for input_seq in input_seqs:
+    if "[" in input_seq or "]" in input_seq:
+        input_seq = convert_nomenclature_to_sequence(input_seq)
 
-    if motif["start"] == cursor:
-        nomenclature += f"[{use_motif}]{motif['repeats']}"
-        cursor = motif['end']
-    else:
-        nomenclature += f"[N]{motif['start'] - cursor}"
-        nomenclature += f"[{use_motif}]{motif['repeats']}"
-        cursor = motif['end']
-if cursor < len(input_seq):
-    nomenclature += f"[N]{len(input_seq) - cursor}"
-nomenclature += "[END]"
+    for char in input_seq:
+        if char not in accepted_chars:
+            st.error("Invalid characters are ignored")
+            break
 
-st.write(nomenclature)
+    input_seq = "".join([char for char in input_seq if char in accepted_chars])
+
+    motifs_list = [line.rstrip('\n') for line in open("motifs.txt")]
+    base_motifs_list = [line.rstrip("\n").split(",") for line in open("motifs_dict.txt")]
+    base_motifs_dict = {key: value for key, value in base_motifs_list}
+
+    str_repeat_list = []
+
+    for str_motif in motifs_list:
+        repeat_num = max(min_len[len(str_motif)], min_repeats)
+        if str_motif * repeat_num in input_seq:
+            pattern = f"((?:{str_motif}){{{repeat_num},}})"
+
+            for match in re.finditer(pattern, input_seq):
+                str_repeat_list.append({"start": match.start(1), "end": match.end(1), "motif": str_motif,
+                                        "repeats": match.group(1).count(str_motif)})
+        else:
+            continue
+
+    sorted_str_repeat_list = sorted(str_repeat_list, key=lambda d: d['start'])
+
+    nomenclature = ""
+    cursor = 0
+
+    for motif in sorted_str_repeat_list:
+        if convert_to_base_motif:
+            if motif['motif'] in base_motifs_dict:
+                use_motif = base_motifs_dict[motif['motif']]
+            else:
+                use_motif = motif['motif']
+        else:
+            use_motif = motif['motif']
+
+        if motif["start"] == cursor:
+            nomenclature += f"{use_motif}[{motif['repeats']}]"
+            cursor = motif['end']
+        else:
+            nomenclature += f"N[{motif['start'] - cursor}]"
+            nomenclature += f"{use_motif}[{motif['repeats']}]"
+            cursor = motif['end']
+    if cursor < len(input_seq):
+        nomenclature += f"N[{len(input_seq) - cursor}]"
+    nomenclature += ""
+
+    st.write(nomenclature)
