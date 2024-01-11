@@ -25,7 +25,7 @@ def convert_nomenclature_to_sequence(input_seq):
     return sequence
 
 
-for input_seq in input_seqs:
+for i, input_seq in enumerate(input_seqs):
     if "[" in input_seq or "]" in input_seq:
         input_seq = convert_nomenclature_to_sequence(input_seq)
 
@@ -78,8 +78,8 @@ for input_seq in input_seqs:
         nomenclature += f"N[{len(input_seq) - cursor}]"
     nomenclature += ""
 
-    st.header(input_seq)
-    st.write(nomenclature)
+    st.write(f"Sequence {i+1}: {input_seq}")
+    st.subheader(nomenclature)
 
     unique_motifs = set([motif['motif'].replace("~", "") for motif in sorted_str_repeat_list])
     st.write(f"Unique motifs: {unique_motifs}")
